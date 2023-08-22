@@ -1,1 +1,1 @@
-# Fake-thumbnail
+# 釣りサムネ判別スクリプト
