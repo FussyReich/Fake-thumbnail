@@ -1,3 +1,4 @@
 import get
+import requests
 
-URL=get.thumbanilsURL
+URL=get.get_thumbanailsURL
