@@ -15,9 +15,6 @@ type='video',
 maxResults=50,
 ).execute()
 
-thumbnails=search_response['items'][0]['snippet']['thumbnails']['high']['url'] #hqのサムネurl
-maxThumbnails=thumbnails.replace('hq','maxres') #maxresに変換
-print(maxThumbnails)
 videoID=search_response['items'][0]['id']['videoId'] #print(search_response['items'][0]['id']['videoId'])
 statistics=youtube.videos().list(
     #統計情報
@@ -27,10 +24,16 @@ statistics=youtube.videos().list(
 #視聴回数=viewCount 高評価数=likeCount お気に入り数=favoriteCount コメント数=commentCount
 print(statistics['viewCount']) 
 #video_list=[]
-#for item in search_response.get('items', []):
-#    if item['id']['kind'] != 'youtube#video':
-#        continue
-#    print('*' * 10)
-#    print(json.dumps(item, indent=2, ensure_ascii=False))
-#    print('*' * 10)
+def thumbanilsURL():
+    for item in search_response.get('items', []):
+      if item['id']['kind'] != 'youtube#video':
+        continue
+    thumbnailsURL=item['snippet']['thumbnails']['high']['url']
+    maxThumbnailsURL=thumbnailsURL.replace('hq', 'maxres')
+    print(json.dumps(thumbnailsURL, indent=2, ensure_ascii=False))
+    return maxThumbnailsURL
+
+
+
+
 
