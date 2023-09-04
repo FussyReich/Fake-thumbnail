@@ -22,16 +22,22 @@ channel=youtube.channels().list(
   part='snippet,contentDetails',
   id=channelID, #channelID
 ).execute()['items'][0]['contentDetails']
-playlist_id=channel['relatedPlaylists']['uploads']
+playlistid=channel['relatedPlaylists']['uploads']
 
-items_info = youtube.playlistItems().list(
-  part='contentDetails', 
-  playlistId=playlist_id, 
-  maxResults=50,
-).execute()
-video_ids = list(map(lambda item: item['contentDetails']['videoId'], items_info['items']))
+def getVideoIds(playlist_id, page_token):
+  items_info = youtube.playlistItems().list(
+    part='contentDetails', 
+    playlistId=playlist_id, 
+    maxResults=50, 
+    pageToken=page_token
+  ).execute()
+  video_ids = list(map(lambda item: item['contentDetails']['videoId'], items_info['items']))
+  if 'nextPageToken' in items_info:
+    video_ids.extend(getVideoIds(playlist_id, items_info['nextPageToken']))
+  return video_ids
+
 #print(json.dumps(items_info,indent=2, ensure_ascii=False))
-print(json.dumps(video_ids,indent=2, ensure_ascii=False))
+print(getVideoIds(playlistid,''))
 
 #print(json.dumps(channel,indent=2, ensure_ascii=False))
 def thumbanails():
