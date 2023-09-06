@@ -4,8 +4,8 @@ import pandas as pd
 import requests
 import glob
 
-YOUTUBE_API_KEY = 'AIzaSyB_VBZGfozRL1ISMUQU95WIpfOuWI7wXto'
-#YOUTUBE_API_KEY='AIzaSyCKCZjShvqfwLk21MYu_u8MlHyMTG3m5-Q'
+#YOUTUBE_API_KEY = 'AIzaSyB_VBZGfozRL1ISMUQU95WIpfOuWI7wXto'
+YOUTUBE_API_KEY='AIzaSyC_4Wj9v7fRtYTFZjt18TJLhkTS_GDYgoY'
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)  
 
 #検索情報
@@ -36,43 +36,46 @@ def getVideoIds(playlist_id, page_token):
     video_ids.extend(getVideoIds(playlist_id, items_info['nextPageToken']))
   return video_ids
 
-#print(json.dumps(items_info,indent=2, ensure_ascii=False))
-print(getVideoIds(playlistid,''))
 
-#print(json.dumps(channel,indent=2, ensure_ascii=False))
+def getVideo_id():
+  for Video_id in getVideoIds(playlistid,''):
+    statistics=youtube.videos().list(
+      part='snippet,statistics',#統計情報
+      id=Video_id,
+    ).execute()
+
+
 def thumbanails():
   i=1
   for item in search_response.get('items', []):
     if item['id']['kind'] != 'youtube#video':
       continue
-    thumbnailsURL=item['snippet']['thumbnails']['high']['url']
-    maxThumbnailsURL=thumbnailsURL.replace('hq', 'maxres')
-    videoID=item['id']['videoId']
-    statistics=youtube.videos().list(
-      part='statistics',#統計情報
-      id=f'{videoID}',
-    ).execute()['items'][0]['statistics']
-    URL={
-      "maxThumbnailsURL":{
-        "url":maxThumbnailsURL,
-        "videoId":videoID,
-        "statistics":statistics,
+    for Video_id in getVideoIds(playlistid,''):
+      statistics=youtube.videos().list(
+        part='snippet,statistics',#統計情報
+        id=Video_id,
+      ).execute()['items'][0]
+      thumbnailsURL=statistics['snippet']['thumbnails']['high']['url']
+      URL={
+        "ThumbnailsURL":{
+          "url":thumbnailsURL,
+          "videoId":Video_id,
+          "statistics":statistics['statistics'],
+        }
       }
-    }
-    fileName=(f'./json/{i}.json')
-    #response=requests.get(maxThumbnailsURL)
-    response=requests.get(thumbnailsURL)
-    #with open(f'./Good_Thumbnails/{i}.png', 'wb') as f:
-    #  f.write(response.content)
-    with open(f'./Thumbnails/{i}.png', 'wb') as f:
-      f.write(response.content)
-    with open(fileName, 'w') as f:
-      json.dump(URL, f, indent=2, ensure_ascii=False)
-      i+=1
-    print(maxThumbnailsURL)
-  return maxThumbnailsURL
+      fileName=(f'./json/{i}.json')
+      #response=requests.get(maxThumbnailsURL)
+      response=requests.get(thumbnailsURL)
+      #with open(f'./Good_Thumbnails/{i}.png', 'wb') as f:
+      #  f.write(response.content)
+      with open(f'./Thumbnails/{i}.png', 'wb') as f:
+        f.write(response.content)
+      with open(fileName, 'w') as f:
+        json.dump(URL, f, indent=2, ensure_ascii=False)
+        i+=1
+      print(thumbnailsURL)
 
-#thumbanails()
+thumbanails()
 
 
   
